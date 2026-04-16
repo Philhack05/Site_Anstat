@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: cae-webapp
-        image: harbor.cae.anstat/library/site-anstat:latest
+        image: harbor.cae.anstat/library/cae-webapp:latest
         ports:
         - containerPort: 80
         env:
