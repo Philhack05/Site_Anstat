@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  # L'application CI4
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      database.default.hostname: mysql-service
+    depends_on:
+      - mysql-service
+
+  # La base MySQL
+  mysql-service:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: db_rgee_entreprise
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
