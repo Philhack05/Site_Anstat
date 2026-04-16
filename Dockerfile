@@ -22,11 +22,12 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-pl
 FROM php:8.2-apache-bookworm
 
 # Nettoyage des caches et installation forcée
-RUN apt-get clean && apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libicu-dev \
     libpng-dev \
     zlib1g-dev \
-    && docker-php-ext-install intl pdo_mysql mysqli gd \
+    # On limite à 2 jobs simultanés pour ne pas saturer les 8Go
+    && MAKEFLAGS="-j2" docker-php-ext-install intl pdo_mysql mysqli gd \
     && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
 
