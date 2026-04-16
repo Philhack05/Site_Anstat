@@ -1,7 +1,15 @@
 # ÉTAPE 1 : Installation des dépendances avec Composer
+# On utilise l'image composer basée sur PHP 8.2 pour garantir la compatibilité
 FROM composer:2.6 AS vendor
+
+# Installation de l'extension intl requise par CodeIgniter 4
+RUN apt-get update && apt-get install -y libicu-dev \
+    && docker-php-ext-install intl
+
 WORKDIR /app
 COPY composer.json composer.lock ./
+
+# On installe les dépendances
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # ÉTAPE 2 : Image de production (Apache + PHP)
