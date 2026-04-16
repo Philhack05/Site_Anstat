@@ -18,15 +18,17 @@ COPY composer.json composer.lock ./
 # si PHP 8.3 pose toujours problème à laminas-escaper
 RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
 
-# ÉTAPE 2 : Image de production (Apache + PHP)
-FROM php:8.2-apache
+# ÉTAPE 2 : Image de production (Stable et testée)
+FROM php:8.2-apache-bookworm
 
-# Installation des dépendances système et extensions PHP pour CI4
-RUN apt-get update && apt-get install -y \
+# Nettoyage des caches et installation forcée
+RUN apt-get clean && apt-get update && apt-get install -y --no-install-recommends \
     libicu-dev \
     libpng-dev \
+    zlib1g-dev \
     && docker-php-ext-install intl pdo_mysql mysqli gd \
-    && a2enmod rewrite
+    && a2enmod rewrite \
+    && rm -rf /var/lib/apt/lists/*
 
 # Configuration du DocumentRoot pour pointer vers le dossier /public de CI4
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
