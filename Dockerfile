@@ -1,16 +1,22 @@
 # ÉTAPE 1 : Installation des dépendances avec Composer
-# On utilise l'image composer basée sur PHP 8.2 pour garantir la compatibilité
 FROM composer:2.6 AS vendor
 
-# Installation de l'extension intl requise par CodeIgniter 4
-RUN apt-get update && apt-get install -y libicu-dev \
-    && docker-php-ext-install intl
+# Sur Alpine, on utilise 'apk' pour installer les dépendances système
+# icu-dev est nécessaire pour l'extension PHP intl
+RUN apk add --no-cache \
+    icu-dev \
+    libpng-dev \
+    zlib-dev
+
+# L'image Composer inclut déjà les outils pour ajouter des extensions
+RUN docker-php-ext-install intl
 
 WORKDIR /app
 COPY composer.json composer.lock ./
 
-# On installe les dépendances
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# On installe les dépendances en ignorant les vérifications de plateforme 
+# si PHP 8.3 pose toujours problème à laminas-escaper
+RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
 
 # ÉTAPE 2 : Image de production (Apache + PHP)
 FROM php:8.2-apache
